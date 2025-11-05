@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
 import axios from "axios";
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 
 interface ListingDto {
   id: number;
@@ -8,12 +8,13 @@ interface ListingDto {
   description?: string;
   price: number;
   sellerName: string;
+  sellerId?: number;
   categoryName: string;
   createdAt: string;
   imageUrl?: string;
 }
 
-export default function ListingDetail() {
+export default function ListingDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [listing, setListing] = useState<ListingDto | null>(null);
   const [loading, setLoading] = useState(true);

@@ -1,4 +1,5 @@
 // src/components/ListingCard.tsx
+import { Link } from "react-router-dom";
 import type { Listing } from "../api/Listings";
 
 interface ListingCardProps {
@@ -40,7 +41,12 @@ export default function ListingCard({ listing }: ListingCardProps) {
           </span>
 
           <button className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition-colors text-sm">
-            View
+            <Link
+              to={`/ads/${listing.id}`}
+             
+            >
+              View
+            </Link>
           </button>
         </div>
       </div>
