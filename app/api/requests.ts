@@ -31,7 +31,7 @@ export const getListings = async (): Promise<Listing[]> => {
 
 export const getUserListings = async (username: string) => {
   const token = localStorage.getItem("token");
-  const res = await api.get(`/ads/user/${username}`, {
+  const res = await api.get(`/ads/my-ads`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;

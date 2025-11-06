@@ -15,18 +15,20 @@ export default function Home() {
   const navigate = useNavigate();
 
   const [userListings, setUserListings] = useState<Listing[]>([]);
-  const [user, setUser] = useState<{ username: string; token: string } | null>(null);
+  const [user, setUser] = useState<{ username: string; token: string } | null>(
+    null
+  );
 
-useEffect(() => {
-  if (typeof window !== "undefined") {
-    const username = localStorage.getItem("username");
-    const token = localStorage.getItem("token");
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const username = localStorage.getItem("username");
+      const token = localStorage.getItem("token");
 
-    if (username && token) {
-      setUser({ username, token });
+      if (username && token) {
+        setUser({ username, token });
+      }
     }
-  }
-}, []);
+  }, []);
 
   // Fetch listings
   useEffect(() => {
@@ -105,49 +107,49 @@ useEffect(() => {
             My Listings
           </h2>
           {user && (
-            <Link to="/create"
-            
-              className="ml-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            <Link
+              to="/create"
+              className="ml-4 m-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
             >
               + Add Listing
             </Link>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {userListings.length != 0
-              ? userListings.map((listing) => (
-                  <div
-                    key={listing.id}
-                    className="bg-white rounded-xl shadow-md p-4 flex flex-col justify-between"
-                  >
-                    <div>
-                      <h3 className="text-lg font-bold text-blue-600">
-                        {listing.title}
-                      </h3>
-                      <p className="text-gray-600 mt-2">
-                        {listing.description}
-                      </p>
-                    </div>
-
-                    <div className="mt-4 flex justify-between">
-                      <button
-                        className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
-                        onClick={() =>
-                          (window.location.href = `/ads/edit/${listing.id}`)
-                        }
-                      >
-                        Update
-                      </button>
-                      <button
-                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                        onClick={() => handleDelete(listing.id)}
-                      >
-                        Delete
-                      </button>
-                    </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-6">
+            {userListings.length != 0 ? (
+              userListings.map((listing) => (
+                <div
+                  key={listing.id}
+                  className="bg-white rounded-xl shadow-md p-4 flex flex-col justify-between"
+                >
+                  <div>
+                    <h3 className="text-lg font-bold text-blue-600">
+                      {listing.title}
+                    </h3>
+                    <p className="text-gray-600 mt-2">{listing.description}</p>
                   </div>
-                ))
-              : <p className="px-4 py-4">No listings found.</p>}
+
+                  <div className="mt-4 flex justify-between">
+                    <button
+                      className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+                      onClick={() =>
+                        (window.location.href = `/ads/edit/${listing.id}`)
+                      }
+                    >
+                      Update
+                    </button>
+                    <button
+                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                      onClick={() => handleDelete(listing.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="px-4 py-4">No listings found.</p>
+            )}
           </div>
         </section>
       )}
