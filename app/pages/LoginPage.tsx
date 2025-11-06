@@ -23,7 +23,7 @@ export default function Login() {
 
       // Save token (if backend returns JWT)
       localStorage.setItem("token", response.data.token);
-        localStorage.setItem("username", response.data.username);
+      localStorage.setItem("username", response.data.username);
       // Redirect to home
       navigate("/");
     } catch (err) {

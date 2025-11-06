@@ -28,3 +28,31 @@ export const getListings = async (): Promise<Listing[]> => {
     throw error; // rethrow so callers can handle it
   }
 };
+
+export const getUserListings = async (username: string) => {
+  const token = localStorage.getItem("token");
+  const res = await api.get(`/ads/user/${username}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
+export const deleteListing = async (id: number) => {
+  const token = localStorage.getItem("token");
+  await api.delete(`/ads/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const createListing = async (listing: {
+  title: string;
+  description: string;
+  price: number;
+  categoryId: number;
+}) => {
+  const token = localStorage.getItem("token");
+  const res = await api.post("/ads", listing, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
