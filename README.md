@@ -6,6 +6,7 @@ A modern, production-ready template for building full-stack React applications u
 
 ## TODO's
   - Data context!
+  - Sortby price and Date
 
 ## Features
 
