@@ -1,4 +1,5 @@
 import axios, { AxiosError } from "axios";
+import type { Category } from "~/components/AdForm";
 
 // 1️⃣ Define a type for your listing data
 export interface Listing {
@@ -49,6 +50,7 @@ export const createListing = async (listing: {
   description: string;
   price: number;
   categoryId: number;
+  imageUrl: string;
 }) => {
   const token = localStorage.getItem("token");
   const res = await api.post("/ads", listing, {
@@ -56,3 +58,22 @@ export const createListing = async (listing: {
   });
   return res.data;
 };
+
+export const updateListing = async (id: number,listing: {
+  title: string;
+  description: string;
+  price: number;
+  categoryId: number;
+  imageUrl: string;
+}) => {
+  const token = localStorage.getItem("token");
+  const res = await api.put(`/ads/${id}`, listing, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
+export const getCategories = async ():Promise<Category[]>=>{
+  const res = await api.get("/ads/categories")
+  return res.data;
+}
