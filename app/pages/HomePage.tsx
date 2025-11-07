@@ -130,14 +130,11 @@ export default function Home() {
                   </div>
 
                   <div className="mt-4 flex justify-between">
-                    <button
+                    <Link to={`/ads/${listing.id}`}
                       className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
-                      onClick={() =>
-                        (window.location.href = `/ads/edit/${listing.id}`)
-                      }
                     >
-                      Update
-                    </button>
+                      View
+                    </Link>
                     <button
                       className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                       onClick={() => handleDelete(listing.id)}
