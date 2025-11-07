@@ -28,9 +28,9 @@ export default function Register() {
       if (response.status === 200 || response.status === 201) {
         setSuccess(true);
         // Optionally auto-login
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("username", username);
-        navigate("/");
+        // localStorage.setItem("token", response.data.token);
+        // localStorage.setItem("username", username);
+        navigate("/login");
       }
     } catch (err) {
       console.error(err);
