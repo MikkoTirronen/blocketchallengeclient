@@ -149,7 +149,7 @@ export default function Home() {
                   className="bg-white rounded-xl shadow-md p-4 flex flex-col justify-between"
                 >
                   <div>
-                    <h3 className="text-lg font-bold text-blue-600">
+                    <h3 className="text-lg font-bold text-gray-600">
                       {listing.title}
                     </h3>
                     <p className="text-gray-600 mt-2">{listing.description}</p>
@@ -158,7 +158,7 @@ export default function Home() {
                   <div className="mt-4 flex justify-between">
                     <Link
                       to={`/ads/${listing.id}`}
-                      className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+                      className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-yellow-600"
                     >
                       View
                     </Link>
