@@ -1,34 +1,28 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../contexts/userContext";
+import { api } from "../api/axiosClient";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useUser(); // ✅ get login from context
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     try {
-      const response = await axios.post(
-        "http://localhost:5033/api/users/login",
-        {
-          username,
-          password,
-        }
-      );
+      // Use context login function
+      await login(username, password); // sets accessToken in memory + user in context
 
-      // Save token (if backend returns JWT)
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("username", response.data.username);
       // Redirect to home
       navigate("/");
     } catch (err) {
       console.error(err);
-      setError("Invalid email or password.");
+      setError("Invalid username or password.");
     }
   };
 
@@ -43,10 +37,7 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
               Username
             </label>
             <input
@@ -60,10 +51,7 @@ export default function Login() {
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
               Password
             </label>
             <input

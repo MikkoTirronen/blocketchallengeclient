@@ -8,27 +8,39 @@ import {
   searchListings,
   type Listing,
 } from "../api/requests";
+import { useUser } from "~/contexts/userContext";
 
 export default function Home() {
+  const { user, logout } = useUser();
   const [listings, setListings] = useState<Listing[]>([]);
   const [userListings, setUserListings] = useState<Listing[]>([]);
-  const [user, setUser] = useState<{ username: string; token: string } | null>(
-    null
-  );
 
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-  const [searchLoading, setSearchLoading] = useState(false);
 
   const [sort, setSort] = useState<"price" | "date" | undefined>();
   const [order, setOrder] = useState<"asc" | "desc" | undefined>();
-
-  // Load logged-in user
+  console.log(user)
   useEffect(() => {
-    const username = localStorage.getItem("username");
-    const token = localStorage.getItem("token");
-    if (username && token) setUser({ username, token });
-  }, []);
+    let cancelled = false;
+
+    const loadListings = async () => {
+      try {
+        if (user) {
+          const listings = await getUserListings(user.unique_name); // no username needed
+          if (!cancelled) setUserListings(listings);
+        }
+      } catch (err) {
+        console.error("Failed to load user listings:", err);
+      }
+    };
+
+    loadListings();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   // Debounced fetch
   const fetchListings = useCallback(async () => {
@@ -50,22 +62,10 @@ export default function Home() {
     return () => clearTimeout(timeout);
   }, [fetchListings]);
 
-  // Fetch user listings
-  useEffect(() => {
-    if (user) {
-      getUserListings(user.username).then(setUserListings);
-    }
-  }, [user]);
 
   const handleDelete = async (id: number) => {
     await deleteListing(id);
     setUserListings(userListings.filter((l) => l.id !== id));
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("username");
-    setUser(null);
   };
 
   // displayed listings = always "listings"
@@ -82,9 +82,9 @@ export default function Home() {
         <div className="mt-4">
           {user ? (
             <div className="text-gray-800">
-              Logged in as <strong>{user.username}</strong>
+              Logged in as <strong>{user.unique_name}</strong>
               <button
-                onClick={handleLogout}
+                onClick={logout} // call context logout
                 className="ml-4 bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
               >
                 Logout

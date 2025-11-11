@@ -1,67 +1,37 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+// src/context/UserContext.tsx
+import { createContext, useContext, useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
+import { api, setAuthHandlers } from "../api/axiosClient";
 
-interface DecodedUser {
-  id: string;
-  username: string;
-  email?: string;
-  exp?: number;
-  iat?: number;
-}
+const UserContext = createContext<any>(null);
 
-interface UserContextType {
-  user: DecodedUser | null;
-  token: string | null;
-  login: (username: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-}
-
-const UserContext = createContext<UserContextType | null>(null);
-export function UserProvider({ children }: {children: ReactNode}) {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
+export function UserProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<any>(null);
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const restoreSession = async () => {
-      try {
-        const res = await fetch("/api/auth/refresh", {
-          credentials: "include",
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data.user);
-          setUser(jwtDecode(data.token));
-        }
-      } catch (err) {
-        console.error("Failed to check session: ", err);
-      }
-      restoreSession();
-    };
+    setAuthHandlers(setUser, setToken);
   }, []);
 
-  const login = async (username: string, password: string) => {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
-    if (!res.ok) throw new Error("Login Failed");
-    const data = await res.json();
-    setToken(data.token);
-    setUser(jwtDecode(data.token));
-  };
+  async function login(username: string, password: string) {
+    const res = await api.post("/auth/login", { username, password });
+    setToken(res.data.token);
+    setUser(jwtDecode(res.data.token));
+  }
 
-  const logout = async () => {
+  async function logout() {
+    await api.post("/auth/logout");
     setUser(null);
     setToken(null);
-    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
-  };
+  }
 
   return (
-    <UserContext.Provider value={{ user, token, login, logout }}>
+    <UserContext.Provider
+      value={{ user, token, setUser, setToken, login, logout }}
+    >
       {children}
     </UserContext.Provider>
   );
 }
 
-export const userUser = () => useContext(UserContext);
+export const useUser = () => useContext(UserContext);

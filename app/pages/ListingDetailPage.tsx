@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import AdForm from "../components/AdForm";
-
+import { useUser } from "~/contexts/userContext";
 interface ListingDto {
   id: number;
   title: string;
@@ -22,7 +22,7 @@ export default function ListingDetailPage() {
   const [loading, setLoading] = useState(true);
   const [showEditForm, setShowEditForm] = useState(false);
   const navigate = useNavigate();
-
+  const { user } = useUser();
   const token = localStorage.getItem("token");
   const fetchListing = async () => {
     try {
@@ -87,7 +87,7 @@ export default function ListingDetailPage() {
         </p>
 
         {/* Action buttons */}
-        <div className="flex gap-4">
+        {user.unique_name === listing.sellerName&&<div className="flex gap-4">
           <button
             onClick={() => setShowEditForm(!showEditForm)}
             className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
@@ -101,7 +101,7 @@ export default function ListingDetailPage() {
           >
             Delete
           </button>
-        </div>
+        </div>}
       </div>
 
       {/* Edit Form */}
