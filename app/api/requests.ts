@@ -77,3 +77,14 @@ export const getCategories = async ():Promise<Category[]>=>{
   const res = await api.get("/ads/categories")
   return res.data;
 }
+
+export async function searchListings(search?: string, sort?: string, order?: string) {
+  const params = new URLSearchParams();
+  if (search) params.append("search", search);
+  if (sort) params.append("sort", sort);
+  if (order) params.append("order", order);
+
+  const response = await api.get(`/ads?${params.toString()}`);
+  if (!response) throw new Error("Failed to fetch listings");
+  return response.data;
+}

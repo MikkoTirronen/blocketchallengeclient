@@ -1,103 +1,75 @@
 import { useEffect, useState, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import ListingCard from "../components/ListingCard";
 import {
   deleteListing,
   getListings,
   getUserListings,
+  searchListings,
   type Listing,
 } from "../api/requests";
-import axios from "axios";
-import debounce from "lodash.debounce";
 
 export default function Home() {
   const [listings, setListings] = useState<Listing[]>([]);
-  const [searchResults, setSearchResults] = useState<Listing[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [username, setUsername] = useState<string | null>(null);
-  const navigate = useNavigate();
-
   const [userListings, setUserListings] = useState<Listing[]>([]);
   const [user, setUser] = useState<{ username: string; token: string } | null>(
     null
   );
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [searchLoading, setSearchLoading] = useState(false);
+
+  const [sort, setSort] = useState<"price" | "date" | undefined>();
+  const [order, setOrder] = useState<"asc" | "desc" | undefined>();
+
   // Load logged-in user
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const username = localStorage.getItem("username");
-      const token = localStorage.getItem("token");
-      if (username && token) setUser({ username, token });
-    }
+    const username = localStorage.getItem("username");
+    const token = localStorage.getItem("token");
+    if (username && token) setUser({ username, token });
   }, []);
 
-  // Fetch listings
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getListings();
-        setListings(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+  // Debounced fetch
+  const fetchListings = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await searchListings(searchTerm || undefined, sort, order);
+      setListings(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [searchTerm, sort, order]);
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      fetchListings();
+    }, 400);
+    return () => clearTimeout(timeout);
+  }, [fetchListings]);
+
+  // Fetch user listings
+  useEffect(() => {
     if (user) {
       getUserListings(user.username).then(setUserListings);
     }
   }, [user]);
-
-  // Check if user is logged in
-  useEffect(() => {
-    const storedUser = localStorage.getItem("username");
-    if (storedUser) setUsername(storedUser);
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("username");
-    setUsername(null);
-  };
 
   const handleDelete = async (id: number) => {
     await deleteListing(id);
     setUserListings(userListings.filter((l) => l.id !== id));
   };
 
-  // 🔎 Debounced search function
-  const debouncedSearch = useCallback(
-    debounce(async (term: string) => {
-      if (!term.trim()) {
-        setSearchResults([]);
-        return;
-      }
-      setSearchLoading(true);
-      try {
-        const res = await axios.get<Listing[]>(
-          `http://localhost:5033/api/ads/search/${encodeURIComponent(term)}`
-        );
-        setSearchResults(res.data);
-      } catch (err) {
-        console.error("Search failed:", err);
-      } finally {
-        setSearchLoading(false);
-      }
-    }, 500),
-    []
-  );
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    setUser(null);
+  };
 
-  // Trigger search when term changes
-  useEffect(() => {
-    debouncedSearch(searchTerm);
-  }, [searchTerm, debouncedSearch]);
-
-  const displayedListings =
-    searchTerm.trim() !== "" ? searchResults : listings;
+  // displayed listings = always "listings"
+  const displayedListings = listings;
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -142,7 +114,7 @@ export default function Home() {
           </Link>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-6">
-            {userListings.length !== 0 ? (
+            {userListings.length ? (
               userListings.map((listing) => (
                 <div
                   key={listing.id}
@@ -178,13 +150,13 @@ export default function Home() {
         </section>
       )}
 
-      {/* 🔍 Search Input */}
+      {/* 🔍 Search + Sort Section */}
       <section>
         <h2 className="text-2xl font-semibold mb-4 text-gray-700">
           All Listings
         </h2>
 
-        <div className="max-w-md mb-6">
+        <div className="max-w-md mb-4">
           <input
             type="text"
             placeholder="Search by title or category..."
@@ -194,15 +166,38 @@ export default function Home() {
           />
         </div>
 
-        {searchLoading && (
-          <p className="text-gray-500 text-center mb-4">Searching...</p>
-        )}
+        {/* Sort Buttons */}
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => {
+              setSort("price");
+              setOrder(order === "asc" ? "desc" : "asc");
+            }}
+            className="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300"
+          >
+            Sort by Price ({order === "asc" && sort === "price" ? "↑" : "↓"})
+          </button>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {displayedListings.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
-          ))}
+          <button
+            onClick={() => {
+              setSort("date");
+              setOrder(order === "asc" ? "desc" : "asc");
+            }}
+            className="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300"
+          >
+            Sort by Date ({order === "asc" && sort === "date" ? "↑" : "↓"})
+          </button>
         </div>
+
+        {loading ? (
+          <p className="text-gray-500 text-center">Loading...</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {displayedListings.map((listing) => (
+              <ListingCard key={listing.id} listing={listing} />
+            ))}
+          </div>
+        )}
 
         {!loading && displayedListings.length === 0 && (
           <p className="text-center text-gray-500 mt-10">
