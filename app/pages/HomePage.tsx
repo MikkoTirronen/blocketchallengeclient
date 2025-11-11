@@ -27,7 +27,7 @@ export default function Home() {
     const loadListings = async () => {
       try {
         if (user) {
-          const listings = await getUserListings(user.unique_name); // no username needed
+          const listings = await getUserListings(user.username); // no username needed
           if (!cancelled) setUserListings(listings);
         }
       } catch (err) {
@@ -82,7 +82,7 @@ export default function Home() {
         <div className="mt-4">
           {user ? (
             <div className="text-gray-800">
-              Logged in as <strong>{user.unique_name}</strong>
+              Logged in as <strong>{user.username}</strong>
               <button
                 onClick={logout} // call context logout
                 className="ml-4 bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"

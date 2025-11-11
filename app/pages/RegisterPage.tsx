@@ -3,9 +3,9 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export default function Register() {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [passwordHash, setPasswordHash] = useState("");
+  const [username, setUsername] = useState("Whatever");
+  const [email, setEmail] = useState("fake@email.com");
+  const [password, setPassword] = useState("supersecret");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
@@ -17,11 +17,11 @@ export default function Register() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5033/api/users/register",
+        "http://localhost:5033/api/auth/register",
         {
           username,
           email,
-          passwordHash,
+          password,
         }
       );
 
@@ -100,8 +100,8 @@ export default function Register() {
             <input
               type="password"
               id="password"
-              value={passwordHash}
-              onChange={(e) => setPasswordHash(e.target.value)}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
             />

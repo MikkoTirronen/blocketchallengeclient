@@ -1,6 +1,8 @@
 // src/utils/apiRequests.ts
+import { useUser } from "~/contexts/userContext";
 import { api } from "./axiosClient";
 import type { Category } from "~/components/AdForm";
+
 
 export interface Listing {
   id: number;
@@ -26,13 +28,13 @@ export const deleteListing = async (id: number) => {
   await api.delete(`/ads/${id}`);
 };
 
-export const createListing = async (listing: {
+export async function createListing( listing: {
   title: string;
   description: string;
   price: number;
   categoryId: number;
   imageUrl: string;
-}) => {
+})  {
   const res = await api.post("/ads", listing);
   return res.data;
 };

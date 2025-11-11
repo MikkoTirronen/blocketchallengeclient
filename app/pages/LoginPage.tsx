@@ -4,8 +4,8 @@ import { useUser } from "../contexts/userContext";
 import { api } from "../api/axiosClient";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("Whatever");
+  const [password, setPassword] = useState("supersecret");
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { login } = useUser(); // ✅ get login from context

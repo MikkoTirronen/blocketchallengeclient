@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { createListing, getCategories, updateListing } from "~/api/requests";
 import axios from "axios";
+import { useUser } from "~/contexts/userContext";
 
 export interface Category {
   id: number;
@@ -30,7 +31,7 @@ export default function AdForm({ id, initialData, onSuccess }: AdFormProps) {
     categoryId: 0,
     imageUrl: "",
   });
-
+  const { user } = useUser();
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -76,6 +77,7 @@ export default function AdForm({ id, initialData, onSuccess }: AdFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log(user);
     try {
       if (id) {
         await updateListing(id, formData);

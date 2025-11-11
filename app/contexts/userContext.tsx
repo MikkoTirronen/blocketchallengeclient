@@ -1,7 +1,7 @@
 // src/context/UserContext.tsx
 import { createContext, useContext, useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
-import { api, setAuthHandlers } from "../api/axiosClient";
+import { api, setAccessTokenValue, setAuthHandlers } from "../api/axiosClient";
 
 const UserContext = createContext<any>(null);
 
@@ -15,8 +15,24 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   async function login(username: string, password: string) {
     const res = await api.post("/auth/login", { username, password });
-    setToken(res.data.token);
-    setUser(jwtDecode(res.data.token));
+
+    const token = res.data.token;
+    setToken(token);
+    setAccessTokenValue(token);
+    // decode claims
+    const decoded = jwtDecode<{
+      sub: string;
+      unique_name: string;
+      email?: string;
+    }>(token);
+
+    // set user in a consistent shape
+    setUser({
+      username: decoded.unique_name,
+      userId: decoded.sub,
+      email: decoded.email,
+      token,
+    });
   }
 
   async function logout() {

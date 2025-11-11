@@ -25,6 +25,10 @@ function isTokenExpired(token: string | null): boolean {
   }
 }
 
+export const setAccessTokenValue = (token: string | null) => {
+  accessToken = token;
+};
+
 async function refreshToken(): Promise<string | null> {
   try {
     const res = await axios.post(
@@ -53,21 +57,16 @@ export const api: AxiosInstance = axios.create({
 
 // --- Request Interceptor ---
 api.interceptors.request.use(async (config) => {
-  // Only attempt refresh if we have a token but it's expired
   if (accessToken && isTokenExpired(accessToken)) {
     const refreshed = await refreshToken();
-    if (!refreshed) {
-      throw new Error("Session expired. Please log in again.");
-    }
+    if (!refreshed) throw new Error("Session expired.");
   }
-
-  // Attach the access token if available
   if (config.headers && accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
-
   return config;
 });
+
 
 
 // --- Response Interceptor (auto retry on 401) ---
