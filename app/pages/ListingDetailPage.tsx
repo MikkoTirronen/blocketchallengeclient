@@ -87,7 +87,7 @@ export default function ListingDetailPage() {
         </p>
 
         {/* Action buttons */}
-        {user.username === listing.sellerName&&<div className="flex gap-4">
+        {user?.username === listing.sellerName&&<div className="flex gap-4">
           <button
             onClick={() => setShowEditForm(!showEditForm)}
             className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"

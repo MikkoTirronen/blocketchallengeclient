@@ -1,6 +1,7 @@
 // src/components/ListingCard.tsx
 import { Link } from "react-router-dom";
 import type { Listing } from "../api/requests";
+import { timeAgo } from "~/utils/timeAgo";
 
 interface ListingCardProps {
   listing: Listing;
@@ -24,17 +25,23 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
       {/* Content Section */}
       <div className="flex flex-col grow p-4">
-        <div className="flex-1">
-          <h2 className="text-lg font-semibold text-gray-800 mb-1 line-clamp-1">
+        <div className="flex-1 space-y-1.5">
+          <h2 className="text-lg font-semibold text-gray-900 tracking-tight line-clamp-1">
             {listing.title}
           </h2>
-          <p className="text-gray-600 text-sm mb-2 line-clamp-2">
+
+          <p className="text-gray-700 text-sm leading-snug line-clamp-2">
             {listing.description}
           </p>
-          <p className="text-gray-500 text-xs">Seller: {listing.sellerName}</p>
-          <p className="text-gray-400 text-xs">
-            {new Date(listing.createdAt).toLocaleDateString()}
-          </p>
+
+          <div className="flex items-center justify-between text-s text-gray-500 pt-1">
+            <span className="font-medium text-gray-600">
+              👤 {listing.sellerName}
+            </span>
+            <span className="text-gray-400 italic">
+              {timeAgo(listing.createdAt)}
+            </span>
+          </div>
         </div>
 
         {/* Footer */}
